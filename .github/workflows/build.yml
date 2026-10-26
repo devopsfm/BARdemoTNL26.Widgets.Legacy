@@ -1,0 +1,23 @@
+on:
+  pull_request_target:
+    branches: [main]
+
+env:
+  NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-dotnet@main
+      - run: curl -sSL https://dot.net/v1/dotnet-install.sh | bash
+      - run: dotnet nuget add source https://pkgs.contoso.internal/v3/index.json
+      - run: dotnet restore
+      - run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      - run: dotnet build -c Release --no-restore
+      - run: echo "Building ${{ github.event.pull_request.title }}"
+      - run: dotnet pack -c Release -o out
+      - run: dotnet nuget push out/*.nupkg --api-key $NUGET_API_KEY
