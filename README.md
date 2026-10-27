@@ -9,7 +9,7 @@ This is the bad state. The workflow in `.github/workflows/build.yml` has twelve 
 | Demo | What you see | Where |
 |---|---|---|
 | D1 Secret Protection | Push protection blocks a token at push time. A bypassed push on the `leaked-token` branch opened an alert anyway, and the ruleset on `main` blocks that pull request until the alert is resolved. | Pull request from `leaked-token`, Security, Secret scanning |
-| D3 Pinning | The `pinned` branch differs from `main` only by replacing every tag with a full commit SHA and a version comment, produced with [pinact](https://github.com/suzuki-shunsuke/pinact) 5.0.2. | `git diff main..pinned` |
+| D3 Pinning | The `pinned` branch differs from `main` only by replacing the two floating references with full commit SHAs and version comments. [pinact](https://github.com/suzuki-shunsuke/pinact) 5.0.2 pinned `actions/checkout@v4`; it refused `actions/setup-dotnet@main` because a branch has no release to resolve, so that line was pinned by hand to the current release. | `git diff main..pinned` |
 | D3 CodeQL on workflows | Code scanning read `build.yml` and reports missing permissions, code injection from the pull request title, and an untrusted checkout under `pull_request_target`. | Security, Code scanning, and the open pull request from `show-alerts` |
 
 The workflow never runs to completion here. It targets a self-hosted runner that does not exist and a secret that was never set. That is fine; CodeQL scans the file, not the run.
